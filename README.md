@@ -1,16 +1,17 @@
 # IMAP Email Server
 
 ## Overview
-This project is an email processing server using Node.js, Express, and Nodemailer. It supports file uploads, HMAC signature verification, access control, and secure email sending via SMTP. The server can be deployed manually or using Docker.
+This project is an email processing server using Node.js, Express, and Nodemailer. It supports file uploads, HMAC signature verification, access control, secure email sending via SMTP, and protection against spam and injection attacks. The server can be deployed manually or using Docker.
 
 ## Technology Stack
 - **Node.js 18** – Runtime environment
 - **Express** – Web framework
-- **Multer** – File upload handling
+- **Multer** – File upload handling (supports `multipart/form-data` for PDF attachments)
 - **Nodemailer** – Email sending
 - **dotenv** – Environment variables management
 - **CryptoJS** – HMAC signature verification
 - **Docker & Docker Compose** – Containerization
+- **Security Features** – Protection against SQL injection, XSS, and spam prevention
 
 ## Environment Variables
 The application uses an `.env.local` file for configuration. Example:
@@ -75,6 +76,8 @@ const signature = CryptoJS.HmacSHA256(payload, process.env.SECRET_KEY).toString(
 ### Send Email
 **Endpoint:** `POST /send-email`
 
+**Content-Type:** `multipart/form-data`
+
 **Request Body:**
 ```json
 {
@@ -84,7 +87,8 @@ const signature = CryptoJS.HmacSHA256(payload, process.env.SECRET_KEY).toString(
   "text": "Hello, this is a test email.",
   "data": "{\"firstName\": \"John\", \"lastName\": \"Doe\"}",
   "timestamp": "1700000000",
-  "signature": "generated_hmac_signature"
+  "signature": "generated_hmac_signature",
+  "pdf": "<attached file>"
 }
 ```
 
@@ -95,6 +99,13 @@ const signature = CryptoJS.HmacSHA256(payload, process.env.SECRET_KEY).toString(
   "message": "Email sent!"
 }
 ```
+
+## Security Features
+- **HMAC Signature Verification**: Prevents unauthorized API access.
+- **Access Control**: Restricts API usage based on IP and Origin headers.
+- **Request Expiry Check**: Prevents replay attacks.
+- **Input Validation**: Protects against SQL injections and invalid data formats.
+- **Spam Prevention**: Blocks mass email sending from unauthorized sources.
 
 ## Contributing
 Feel free to submit issues or pull requests to improve the project.
