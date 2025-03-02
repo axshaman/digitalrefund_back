@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  swiss-backend:
+    build:
+      context: ./imapserver
+      dockerfile: ../Dockerfile
+    container_name: swiss-backend
+    ports:
+      - "127.0.0.1:8497:8497"
+    env_file:
+      - ./imapserver/.env.local
+    volumes:
+      - ./imapserver:/app
+      - /app/node_modules
+    restart: unless-stopped
